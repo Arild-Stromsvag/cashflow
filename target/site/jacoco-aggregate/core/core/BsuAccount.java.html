@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>BsuAccount.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">ui</a> &gt; <a href="../index.html" class="el_bundle">core</a> &gt; <a href="index.source.html" class="el_package">core</a> &gt; <span class="el_source">BsuAccount.java</span></div><h1>BsuAccount.java</h1><pre class="source lang-java linenums">package core;
+
+
+/**
+ * A class that creates a Bsu account with its restrictions.
+ */
+public class BsuAccount extends AbstractAccount {
+
+  /**
+   * Initializes a new BsuAccount-object.
+   *
+   * @param name the name of the account
+   * @param accountNumber the account number of the account
+   * @param owner the owner of the account
+   * @throws IllegalArgumentException if the name is more than 20 characters long or contains
+   *         characters other than letters and spaces
+   * @throws IllegalArgumentException if the account number is not between 1000 and 9999 or already
+   *         exists in the users list of account numbers
+   * @throws IllegalStateException if the initial balance is set to be less than 0 or 
+   *         more than 25000 or the user already owns a Bsu-account
+   */
+  public BsuAccount(String name, double balance, int accountNumber, User owner) {
+<span class="fc" id="L23">    super(name, accountNumber, owner);</span>
+<span class="fc" id="L24">    checkIfUserDoesNotHaveBsu(owner);</span>
+<span class="fc" id="L25">    setOwner(owner);</span>
+<span class="fc" id="L26">    checkIfValidDeposit(balance);</span>
+<span class="fc" id="L27">    initialDeposit(balance);</span>
+<span class="fc" id="L28">  }</span>
+
+  /**
+   * Initializes a new BsuAccount-object, and also generates the next available account number for
+   * this particular user.
+   *
+   * @param name the name of the account
+   * @param owner the owner of the account
+   * @throws IllegalArgumentException if the name is more than 20 characters long or contains
+   *         characters other than letters and spaces
+   * @throws IllegalStateException if the maximum number of accounts have been reached for this user
+   * @throws IllegalStateException if the initial balance is set to be less than 0 
+   *         or more than 25000 or the user already owns a Bsu-account
+   */
+  public BsuAccount(String name, double balance, User owner) {
+<span class="fc" id="L43">    super(name, owner);</span>
+<span class="fc" id="L44">    checkIfUserDoesNotHaveBsu(owner);</span>
+<span class="fc" id="L45">    setOwner(owner);</span>
+<span class="fc" id="L46">    checkIfValidDeposit(balance);</span>
+<span class="fc" id="L47">    initialDeposit(balance);</span>
+<span class="fc" id="L48">  }</span>
+
+  /**
+   * Deposits the given amount in to the account, which must not exceed 25000. Also adds this
+   * transaction to the transaction history.
+   *
+   * @param amount the amount to be deposited
+   * @throws IllegalArgumentException if the given amount is negative
+   * @throws IllegalStateException if the deposit leads to the balance exceeding the cap of 25000
+   */
+  @Override
+  public void deposit(double amount) {
+<span class="fc" id="L60">    checkIfValidDeposit(amount);</span>
+<span class="fc" id="L61">    super.deposit(amount);</span>
+<span class="fc" id="L62">  }</span>
+
+  /**
+   * This method does nothing, because you cannot withdraw from a Bsu account, unless its used as
+   * deductable for a mortgage.
+   *
+   * @param amount the amount to be withdrawn
+   */
+  @Override
+<span class="nc" id="L71">  public void withdraw(double amount) {}</span>
+
+  /**
+   * This method does nothing, because you cannot transfer from a Bsu account, unless its used as
+   * deductable for a mortgage.
+   *
+   * @param amount the amount to be transfered
+   */
+  @Override
+<span class="nc" id="L80">  public void transfer(AbstractAccount recievingAccount, double amount) {}</span>
+
+  private void checkIfValidDeposit(double amount) {
+<span class="fc bfc" id="L83" title="All 2 branches covered.">    if (!isValidDeposit(amount)) {</span>
+<span class="fc" id="L84">      throw new IllegalStateException(&quot;The deposit of '&quot; + amount </span>
+          + &quot;' led to the balance exceeding the cap of 25000&quot;);
+    }
+<span class="fc" id="L87">  }</span>
+
+  /**
+   * Checks whether the given user has a Bsu account or not.
+   *
+   * @param user to be checked.
+   */
+  private void checkIfUserDoesNotHaveBsu(User user) {
+<span class="fc bfc" id="L95" title="All 2 branches covered.">    if (user != null) {</span>
+<span class="fc" id="L96">      long numberOfBsu = user.getAccounts().stream()</span>
+<span class="fc" id="L97">          .filter(account -&gt; account instanceof BsuAccount).count();</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">      if (numberOfBsu &gt; 1) {</span>
+<span class="fc" id="L99">        user.removeAccount(this);</span>
+<span class="fc" id="L100">        throw new IllegalStateException(&quot;A user can only own excactly one Bsu-account&quot;);</span>
+      }
+    }
+<span class="fc" id="L103">  }</span>
+
+  /**
+   * Checks if the deposit leads to the balance of the BsuAccount exceeding the cap of 25000.
+   *
+   * @param amount the amount to be added
+   * @return {@code false} if the balance exceeds 25000
+   */
+  public boolean isValidDeposit(double amount) {
+<span class="fc" id="L112">    double newBalance = amount + getBalance();</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">    return newBalance &lt;= 25000;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

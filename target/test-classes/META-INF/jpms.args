@@ -1,0 +1,4 @@
+--patch-module
+cashflow.ui=_
+--add-reads
+cashflow.ui=ALL-UNNAMED

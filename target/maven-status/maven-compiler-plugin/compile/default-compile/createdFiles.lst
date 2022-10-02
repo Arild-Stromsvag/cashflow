@@ -1,0 +1,9 @@
+ui\RemoteAccess.class
+ui\CashFlowApp.class
+ui\CashFlowController.class
+module-info.class
+ui\CashFlowAccess.class
+ui\AppController.class
+ui\DirectAccess.class
+ui\DetailsController.class
+ui\RemoteCashFlowApp.class

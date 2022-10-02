@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>BankHelper.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">ui</a> &gt; <a href="../index.html" class="el_bundle">core</a> &gt; <a href="index.source.html" class="el_package">core</a> &gt; <span class="el_source">BankHelper.java</span></div><h1>BankHelper.java</h1><pre class="source lang-java linenums">package core;
+
+
+/**
+ * Library for checking and validating certain parameters and conditions for all our
+ * cashflow-objects.
+ */
+<span class="nc" id="L8">public final class BankHelper {</span>
+
+  /**
+   * Checks if the UserID is between 100000 and 999999.
+   *
+   * @param userID the UserID to be checked
+   * @throws IllegalArguementException if the UserID isn't between 100000 and 999999
+   */
+  static void checkIfValidUserId(int userId) {
+<span class="fc" id="L17">    int numberOfDigits = (int) Math.log10(userId) + 1;</span>
+<span class="fc bfc" id="L18" title="All 2 branches covered.">    if (numberOfDigits != 6) {</span>
+<span class="fc" id="L19">      throw new IllegalArgumentException(</span>
+          &quot;UserID must be between 100000 and 999999, but had: &quot; + numberOfDigits + &quot; digits.&quot;);
+    }
+<span class="fc" id="L22">  }</span>
+
+  /**
+   * Checks if the account number is taken.
+   *
+   * @param accountNumber the account number to check
+   * @param user the user to check
+   * @throws IllegalStateException if the account number is taken
+   */
+  static void checkIfAccountNumberIsTaken(int accountNumber, User user) {
+<span class="fc bfc" id="L32" title="All 2 branches covered.">    for (int exisitingAccountNumber : user.getAccountNumbers()) {</span>
+<span class="pc bpc" id="L33" title="1 of 2 branches missed.">      if (exisitingAccountNumber == accountNumber) {</span>
+<span class="nc" id="L34">        throw new IllegalStateException(&quot;The user already has an account with account number: &quot;</span>
+            + accountNumber);
+      }
+<span class="fc" id="L37">    }</span>
+<span class="fc" id="L38">  }</span>
+
+  /**
+   * Checks if the name is 20 characters or less. Checks if the name is only letters and spaces.
+   *
+   * @param name the name to be checked
+   * @throws IllegalArgumentException if the name is more than 20 characters long or does not only
+   *         contain letters and spaces
+   */
+  static void checkIfValidName(String name) {
+<span class="fc bfc" id="L48" title="All 2 branches covered.">    if (!isValidName(name)) {</span>
+<span class="fc" id="L49">      throw new IllegalArgumentException(</span>
+<span class="fc" id="L50">          &quot;The name &quot; + name.length() </span>
+              + &quot; must be 20 characters or less and only contain letters and spaces&quot;);
+    }
+<span class="fc" id="L53">  }</span>
+
+  /**
+   * Checks if the amount added sets the balance in an invalid state (less than 0).
+   * Amount can be negative if you are checking a withdrawal.
+   *
+   * @param amount the amount to be added to the balance
+   * @param account the account to be checked
+   * @throws IllegalStateException if the balance is less than 0 when the amount is added
+   */
+  static void checkIfValidBalance(double amount, AbstractAccount account) {
+<span class="fc bfc" id="L64" title="All 2 branches covered.">    if (!isBalanceValidWhenAdding(amount, account)) {</span>
+<span class="fc" id="L65">      throw new IllegalStateException(</span>
+          &quot;The balance of the account cannot be negative, and adding the amount made it negative&quot;);
+    }
+<span class="fc" id="L68">  }</span>
+
+
+  /**
+   * Checks if the account number is between 1000 and 9999.
+   *
+   * @param accountNumber the acocunt number to be checked
+   * @throws IllegalArgumentException if the account number is not between 1000 and 9999
+   */
+  static void checkIfValidAccountNumber(int accountNumber) {
+<span class="fc bfc" id="L78" title="All 4 branches covered.">    if (accountNumber &lt; 1000 || accountNumber &gt; 9999) {</span>
+<span class="fc" id="L79">      throw new IllegalArgumentException(&quot;Accountnumber must be between 1000 and 9999, but was: &quot; </span>
+          + accountNumber);
+    }
+<span class="fc" id="L82">  }</span>
+
+  /**
+   * Checks if the amount is positive.
+   *
+   * @param amount the amount to be checked
+   * @throws IllegalArgumentException if the amount is negative
+   */
+  static void checkIfValidAmount(double amount) {
+<span class="fc bfc" id="L91" title="All 2 branches covered.">    if (!isPositiveAmount(amount)) {</span>
+<span class="fc" id="L92">      throw new IllegalArgumentException(&quot;The amount must be positive, but was: &quot; + amount);</span>
+    }
+<span class="fc" id="L94">  }</span>
+
+  /**
+   * Checks if the amount is positive.
+   *
+   * @param amount the amount to check
+   * @return {@code true} if the amount is positive
+   */
+  public static boolean isPositiveAmount(double amount) {
+<span class="fc bfc" id="L103" title="All 2 branches covered.">    return amount &gt;= 0;</span>
+  }
+
+  /**
+   * Checks if the amount added sets the balance in an invalid state (less than 0). Amount can be
+   * negative if you are checking a withdrawal.
+   *
+   * @param amount the amount to be added
+   * @return {@code false} if the balance is set to be negative
+   */
+  public static boolean isBalanceValidWhenAdding(double amount, AbstractAccount account) {
+<span class="fc" id="L114">    double newBalance = account.getBalance() + amount;</span>
+<span class="fc bfc" id="L115" title="All 2 branches covered.">    return newBalance &gt;= 0;</span>
+  }
+
+  /**
+   * Checks if the user already owns a Bsu-account.
+   *
+   * @param user the user to be checked
+   * @return {@code true} if the user owns a Bsu-account
+   */
+  public static boolean hasBsu(User user) {
+<span class="fc" id="L125">    return user.getAccounts().stream().anyMatch(account -&gt; account instanceof BsuAccount);</span>
+  }
+
+  /**
+   * Checks if the name is less than 20 characters long and only consists of letters and spaces.
+   *
+   * @param name the name to be checked
+   * @return {@code true} if the name satisfies this rule
+   */
+  public static boolean isValidName(String name) {
+<span class="fc bfc" id="L135" title="All 4 branches covered.">    if (name.length() &gt; 20 || !isOnlyLettersAndSpaces(name)) {</span>
+<span class="fc" id="L136">      return false;</span>
+    }
+<span class="fc" id="L138">    return true;</span>
+  }
+
+  /**
+   * Checks if the given string consists of only letters and spaces.
+   *
+   * @param s the string to check
+   * @return {@code true} if name consists of only letters and spaces
+   */
+  public static boolean isOnlyLettersAndSpaces(String s) {
+<span class="fc bfc" id="L148" title="All 2 branches covered.">    for (int i = 0; i &lt; s.length(); i++) {</span>
+<span class="fc" id="L149">      char ch = s.charAt(i);</span>
+<span class="fc bfc" id="L150" title="All 4 branches covered.">      if (Character.isLetter(ch) || ch == ' ') {</span>
+<span class="fc" id="L151">        continue;</span>
+      }
+<span class="fc" id="L153">      return false;</span>
+    }
+<span class="fc" id="L155">    return true;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

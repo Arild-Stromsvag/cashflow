@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>TransactionDeserializer.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">ui</a> &gt; <a href="../index.html" class="el_bundle">core</a> &gt; <a href="index.source.html" class="el_package">json</a> &gt; <span class="el_source">TransactionDeserializer.java</span></div><h1>TransactionDeserializer.java</h1><pre class="source lang-java linenums">package json;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.DoubleNode;
+import com.fasterxml.jackson.databind.node.IntNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import core.Transaction;
+import java.io.IOException;
+
+/**
+ * A class for deserializing a transaction. 
+ */
+<span class="nc" id="L19">public class TransactionDeserializer extends JsonDeserializer&lt;Transaction&gt; {</span>
+
+  /**
+   * Method for deserialization of a Transaction object.
+   *
+   * @param parser a JsonParser object.
+   * @param ctxt a DeserializationContext object.
+   * @return Transaction object which is returned from helper method
+   * @throws IOException if I/O problem when processing JSON content.
+   * @throws JsonProcessingException if porblem other than I/O is encountered when processing JSON
+   *         content.
+   */
+  @Override
+  public Transaction deserialize(JsonParser parser, DeserializationContext ctxt)
+      throws IOException, JsonProcessingException {
+<span class="nc" id="L34">    TreeNode treeNode = parser.getCodec().readTree(parser);</span>
+<span class="nc" id="L35">    return deserialize((JsonNode) treeNode);</span>
+  }
+
+  /**
+   * Helper method for deserialization of a Transaction object.
+   *
+   * @param jsonNode a JsonNode object.
+   * @return a Transaction object.
+   */
+  public Transaction deserialize(JsonNode jsonNode) {
+<span class="nc bnc" id="L45" title="All 2 branches missed.">    if (jsonNode instanceof ObjectNode) {</span>
+<span class="nc" id="L46">      ObjectNode objectNode = (ObjectNode) jsonNode;</span>
+
+<span class="nc" id="L48">      String payer = &quot;&quot;;</span>
+<span class="nc" id="L49">      int payersAccountNumber = 0;</span>
+<span class="nc" id="L50">      String recipient = &quot;&quot;;</span>
+<span class="nc" id="L51">      int recipientsAccountNumber = 0;</span>
+<span class="nc" id="L52">      double amount = 0.0;</span>
+
+<span class="nc" id="L54">      JsonNode payerNode = objectNode.get(&quot;payer&quot;);</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">      if (payerNode instanceof TextNode) {</span>
+<span class="nc" id="L56">        payer = payerNode.asText();</span>
+      }
+
+<span class="nc" id="L59">      JsonNode payersAccountNumberNode = objectNode.get(&quot;payersAccountNumber&quot;);</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">      if (payersAccountNumberNode instanceof IntNode) {</span>
+<span class="nc" id="L61">        payersAccountNumber = payersAccountNumberNode.asInt();</span>
+      }
+
+<span class="nc" id="L64">      JsonNode recipientNode = objectNode.get(&quot;recipient&quot;);</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">      if (recipientNode instanceof TextNode) {</span>
+<span class="nc" id="L66">        recipient = recipientNode.asText();</span>
+      }
+
+<span class="nc" id="L69">      JsonNode recipientsAccountNumberNode = objectNode.get(&quot;recipientsAccountNumber&quot;);</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">      if (recipientsAccountNumberNode instanceof IntNode) {</span>
+<span class="nc" id="L71">        recipientsAccountNumber = recipientsAccountNumberNode.asInt();</span>
+      }
+
+<span class="nc" id="L74">      JsonNode amountNode = objectNode.get(&quot;amount&quot;);</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">      if (amountNode instanceof DoubleNode) {</span>
+<span class="nc" id="L76">        amount = amountNode.asDouble();</span>
+      }
+
+<span class="nc" id="L79">      return new Transaction(payer, payersAccountNumber, recipient, </span>
+      recipientsAccountNumber, amount);
+    }
+<span class="nc" id="L82">    return null;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

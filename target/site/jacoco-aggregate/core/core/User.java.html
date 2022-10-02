@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>User.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">ui</a> &gt; <a href="../index.html" class="el_bundle">core</a> &gt; <a href="index.source.html" class="el_package">core</a> &gt; <span class="el_source">User.java</span></div><h1>User.java</h1><pre class="source lang-java linenums">package core;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+/**
+ * A class for creating a user for the accounts to be created.
+ */
+public class User {
+
+  private String name;
+  private final int userId;
+<span class="fc" id="L13">  private Collection&lt;AbstractAccount&gt; accounts = new ArrayList&lt;&gt;();</span>
+
+  // ==============================================================================================
+  // Contstructors
+  // ==============================================================================================
+
+  /**
+   * Initializes a new User-object. UserID must be between 100000 and 999999.
+   *
+   * @param userId the users identification number
+   * @throws IllegalArgumentException if the UserID si not between 100000 and 999999
+   */
+<span class="fc" id="L25">  public User(int userId) {</span>
+<span class="fc" id="L26">    BankHelper.checkIfValidUserId(userId);</span>
+<span class="fc" id="L27">    this.userId = userId;</span>
+<span class="fc" id="L28">    name = &quot;&quot;;</span>
+<span class="fc" id="L29">  }</span>
+
+  // ==============================================================================================
+  // Functional methods
+  // ==============================================================================================
+
+  /**
+   * Adds the account to users list of accounts. Also adds the accounts accountnumber to the users
+   * list of accountnumbers.
+   *
+   * @param account the account to be added
+   * @return {@code true} if the account was added
+   */
+  public boolean addAccount(AbstractAccount account) {
+<span class="fc bfc" id="L43" title="All 2 branches covered.">    if (getAccountNumbers().contains(account.getAccountNumber())) {</span>
+<span class="fc" id="L44">      return false;</span>
+    }
+<span class="fc" id="L46">    accounts.add(account);</span>
+<span class="fc" id="L47">    account.setOwner(this);</span>
+<span class="fc" id="L48">    return true;</span>
+  }
+
+  /**
+   * Removes the given account from the users list of accounts. Also removes the accounts
+   * accountnumber from the users list of accountnumbers.
+   *
+   * @param account the account to be removed
+   * @return {@code true} if the account was removed
+   */
+  public boolean removeAccount(AbstractAccount account) {
+<span class="fc bfc" id="L59" title="All 2 branches covered.">    if (accounts.remove(account)) {</span>
+<span class="fc" id="L60">      return true;</span>
+    }
+<span class="fc" id="L62">    return false;</span>
+  }
+
+  // ==============================================================================================
+  // Getters and setters
+  // ==============================================================================================
+
+  public String getName() {
+<span class="fc" id="L70">    return name;</span>
+  }
+
+  public int getUserId() {
+<span class="fc" id="L74">    return userId;</span>
+  }
+
+  public Collection&lt;AbstractAccount&gt; getAccounts() {
+<span class="fc" id="L78">    return new ArrayList&lt;&gt;(accounts);</span>
+  }
+
+  /**
+   * A method that holds the accountnumbers of an account in a collection 
+   * and puts every accountnumber to its account in the list.
+   *
+   * @return the lists of all accounts with its accountnumbers.
+   */
+  public Collection&lt;Integer&gt; getAccountNumbers() {
+<span class="fc" id="L88">    Collection&lt;Integer&gt; accountNumbers = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">    for (AbstractAccount account : getAccounts()) {</span>
+<span class="fc" id="L90">      accountNumbers.add(account.getAccountNumber());</span>
+<span class="fc" id="L91">    }</span>
+<span class="fc" id="L92">    return accountNumbers;</span>
+  }
+
+  /**
+   * Returns the account with the coresponding account number, if the user has an account with this
+   * account number. If not, it returns {@code null}.
+   *
+   * @param accountNumber the account number of the account you wish to find
+   * @return the account with the account number, or {@code null} if the 
+   *        account number doesn't exist
+   */
+  public AbstractAccount getAccount(int accountNumber) {
+<span class="fc" id="L104">    AbstractAccount account = getAccounts().stream()</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">        .filter(existingAccount -&gt; existingAccount.getAccountNumber() == accountNumber)</span>
+<span class="fc" id="L106">        .findAny()</span>
+<span class="fc" id="L107">        .orElse(null);</span>
+<span class="fc" id="L108">    return account;</span>
+  }
+
+  /**
+   * Changes the name of the user. Name must be 20 characters or less, and can only
+   * consist of letters and spaces.
+   *
+   * @param name the name you wish to change to
+   * @throws IllegalArgumentException if the name is more than 20 characters long, or does not only
+   *         contain letters and spaces
+   */
+  public void setName(String name) {
+<span class="fc bfc" id="L120" title="All 2 branches covered.">    if (!BankHelper.isValidName(name)) {</span>
+<span class="fc" id="L121">      throw new IllegalArgumentException(</span>
+<span class="fc" id="L122">          &quot;The name &quot; + name.length()</span>
+          + &quot; must be 20 characters or less and only contain letters and spaces&quot;);
+    }
+<span class="fc" id="L125">    this.name = name;</span>
+<span class="fc" id="L126">  }</span>
+
+  @Override
+  public String toString() {
+<span class="nc" id="L130">    String string = &quot;Name: &quot; + getName() + &quot;\nUserID: &quot; + getUserId() + &quot;\nAccounts:&quot;;</span>
+<span class="nc" id="L131">    StringBuffer sb = new StringBuffer();</span>
+<span class="nc" id="L132">    sb.append(string);</span>
+<span class="nc bnc" id="L133" title="All 2 branches missed.">    for (AbstractAccount account : getAccounts()) {</span>
+<span class="nc" id="L134">      sb.append(&quot;\n&quot; + account.toString());</span>
+<span class="nc" id="L135">    }</span>
+<span class="nc" id="L136">    return sb.toString();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

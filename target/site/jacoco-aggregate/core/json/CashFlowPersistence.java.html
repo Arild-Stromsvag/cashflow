@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>CashFlowPersistence.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">ui</a> &gt; <a href="../index.html" class="el_bundle">core</a> &gt; <a href="index.source.html" class="el_package">json</a> &gt; <span class="el_source">CashFlowPersistence.java</span></div><h1>CashFlowPersistence.java</h1><pre class="source lang-java linenums">package json;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import core.User;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+/**
+ * A class that reads and writes to file.
+ */
+public class CashFlowPersistence {
+
+  private ObjectMapper mapper;
+<span class="fc" id="L20">  private Path saveFilePath = null;</span>
+
+  /**
+   * Constructor for a CashFlowPersistence object that sets the mapper field and registers a
+   * CashFlowModule to the mapper.
+   */
+<span class="fc" id="L26">  public CashFlowPersistence() {</span>
+<span class="fc" id="L27">    mapper = new ObjectMapper();</span>
+<span class="fc" id="L28">    mapper.registerModule(new CashFlowModule());</span>
+<span class="fc" id="L29">  }</span>
+
+  /**
+   * Method for reading a User object with deserialization.
+   *
+   * @param reader a Reader object.
+   * @return a user object constructed with deserialization.
+   * @throws IOException if I/O problem when processing JSON content.
+   */
+  public User readUser(Reader reader) throws IOException {
+<span class="fc" id="L39">    return mapper.readValue(reader, User.class);</span>
+  }
+
+  /**
+   * Method for writing a User object with serialization.
+   *
+   * @param user a User object to be serialized.
+   * @param writer a Writer object.
+   * @throws IOException if I/O problem when processing JSON content.
+   */
+  public void writeUser(User user, Writer writer) throws IOException {
+<span class="fc" id="L50">    mapper.writerWithDefaultPrettyPrinter().writeValue(writer, user);</span>
+<span class="fc" id="L51">  }</span>
+
+  /**
+   * Method for setting the saveFilePath field given a file name.
+   *
+   * @param saveFile name of the JSON file.
+   */
+  public void setSaveFilePath(String saveFile) {
+<span class="fc" id="L59">    this.saveFilePath = Paths.get(System.getProperty(&quot;user.home&quot;), saveFile);</span>
+<span class="fc" id="L60">  }</span>
+
+  /**
+   * Method for setting the saveFilePath field given a file path.
+   *
+   * @param path path of the JSON file.
+   */
+  public void setSaveFilePath(Path path) {
+<span class="fc" id="L68">    checkSaveFilePath(path);</span>
+<span class="fc" id="L69">    this.saveFilePath = path;</span>
+<span class="fc" id="L70">  }</span>
+
+  /**
+   * Validation method for deciding whether file exists or not.
+   *
+   * @param saveFilePath file path to be checked
+   * @throws IllegalStateException if file path is null.
+   */
+  private void checkSaveFilePath(Path saveFilePath) {
+<span class="fc bfc" id="L79" title="All 2 branches covered.">    if (saveFilePath == null) {</span>
+<span class="fc" id="L80">      throw new IllegalStateException(&quot;The save file doesn't exist&quot;);</span>
+    }
+<span class="fc" id="L82">  }</span>
+
+  /**
+   * Method for constructing a User object from data stored in JSON file.
+   *
+   * @return a User object read from file.
+   * @throws IOException if I/O problem occured.
+   * @throws IllegalStateException if file path is null.
+   */
+  public User loadUser() throws IOException, IllegalStateException {
+<span class="fc" id="L92">    checkSaveFilePath(saveFilePath);</span>
+<span class="fc" id="L93">    try (Reader reader = new FileReader(saveFilePath.toFile(), StandardCharsets.UTF_8)) {</span>
+<span class="fc" id="L94">      return readUser(reader);</span>
+    }
+  }
+  
+  /**
+   * Gets a user from file with deserialization.
+   *
+   * @param saveFile the file that is used to have data saved to.
+   * @return user that have been deserialized from the file.
+   * @throws IOException if it does not find the user in the file.
+   * @throws IllegalStateException if it does not find the user in the file.
+   */
+  public User loadUser(String saveFile) throws IOException, IllegalStateException {
+<span class="fc" id="L107">    setSaveFilePath(saveFile);</span>
+<span class="fc" id="L108">    checkSaveFilePath(saveFilePath);</span>
+<span class="fc" id="L109">    try (Reader reader = new FileReader(saveFilePath.toFile(), StandardCharsets.UTF_8)) {</span>
+<span class="fc" id="L110">      return readUser(reader);</span>
+    }
+  }
+
+  /**
+   * Method for storing a User object to a JSON file.
+   *
+   * @param user User object to be stored.
+   * @throws IOException if I/O problem occured.
+   * @throws IllegalStateException if file path is null.
+   */
+  public void saveUser(User user) throws IOException, IllegalStateException {
+<span class="fc" id="L122">    checkSaveFilePath(saveFilePath);</span>
+<span class="fc" id="L123">    try (Writer writer = new FileWriter(saveFilePath.toFile(), StandardCharsets.UTF_8)) {</span>
+<span class="fc" id="L124">      writeUser(user, writer);</span>
+    }
+<span class="fc" id="L126">  }</span>
+
+  /**
+   * Save user to file with serialization.
+   *
+   * @param user User that is saved.
+   * @param saveFile File that gets saved to.
+   * @throws IOException if it does not find the file.
+   * @throws IllegalStateException if it does not find the file.
+   */
+  public void saveUser(User user, String saveFile) throws IOException, IllegalStateException {
+<span class="fc" id="L137">    setSaveFilePath(saveFile);</span>
+<span class="fc" id="L138">    checkSaveFilePath(saveFilePath);</span>
+<span class="fc" id="L139">    try (Writer writer = new FileWriter(saveFilePath.toFile(), StandardCharsets.UTF_8)) {</span>
+<span class="fc" id="L140">      writeUser(user, writer);</span>
+    }
+<span class="fc" id="L142">  }</span>
+
+  /**
+   * Creates a objectmapper that is used for deserialization and serialization.
+   *
+   * @return the objectmapper.
+   */
+  public static ObjectMapper createObjectMapper() {
+<span class="fc" id="L150">    return new ObjectMapper().registerModule(new CashFlowModule());</span>
+  }
+
+  /**
+   * Checks if a file excists.
+   *
+   * @param saveFileName the name of the file.
+   * @return true or false if the file excistes or not.
+   */
+  public boolean doesFileExist(String saveFileName) {
+<span class="nc bnc" id="L160" title="All 2 branches missed.">    if (saveFileName != null) {</span>
+<span class="nc" id="L161">      return Paths.get(System.getProperty(&quot;user.home&quot;), saveFileName).toFile().exists();</span>
+    }
+<span class="nc" id="L163">    return false;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

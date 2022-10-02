@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>Transaction.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">ui</a> &gt; <a href="../index.html" class="el_bundle">core</a> &gt; <a href="index.source.html" class="el_package">core</a> &gt; <span class="el_source">Transaction.java</span></div><h1>Transaction.java</h1><pre class="source lang-java linenums">package core;
+
+/**
+ * A class that holds all the transaction methods based on which type of account it is.
+ */
+public class Transaction {
+
+  /**
+   * An enum for spesifying which type of transaction you want.
+   */
+
+<span class="fc" id="L12">  public enum TransactionType {</span>
+<span class="fc" id="L13">    DEPOSIT, WITHDRAWAL, TRANSFER</span>
+  }
+
+  private final TransactionType type;
+  private final String payer;
+  private final int payersAccountNumber;
+  private final String recipient;
+  private final int recipientsAccountNumber;
+  private final double amount;
+
+  /**
+   * Initializes a new Transaction-object. The Transaction-object is an object which is initialized
+   * each time there's a transfer, deposit or a withdrawal. It keeps track of: the paying account,
+   * the recipient account, the type of transfer and the amount money transferred.
+   *
+   * @param payerAccount the paying account
+   * @param recipientAccount the recieving account
+   * @param amount the amount to be transfered
+   */
+  public Transaction(AbstractAccount payerAccount, 
+<span class="nc" id="L33">      AbstractAccount recipientAccount, double amount) {</span>
+<span class="nc bnc" id="L34" title="All 4 branches missed.">    if (payerAccount == null &amp;&amp; recipientAccount == null) {</span>
+<span class="nc" id="L35">      throw new IllegalArgumentException(&quot;A transaction must have either 'payer' or a 'recipient',&quot; </span>
+          + &quot; but both were null&quot;);
+    }
+<span class="nc bnc" id="L38" title="All 2 branches missed.">    if (amount &lt;= 0) {</span>
+<span class="nc" id="L39">      throw new IllegalArgumentException(&quot;The amount must be larger than 0, but was: &quot; </span>
+          + amount);
+    }
+<span class="nc bnc" id="L42" title="All 2 branches missed.">    if (payerAccount == null) {</span>
+<span class="nc" id="L43">      type = TransactionType.DEPOSIT;</span>
+<span class="nc" id="L44">      this.payer = &quot;&quot;;</span>
+<span class="nc" id="L45">      this.payersAccountNumber = 0;</span>
+<span class="nc" id="L46">      this.recipient = recipientAccount.getName();</span>
+<span class="nc" id="L47">      this.recipientsAccountNumber = recipientAccount.getAccountNumber();</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">    } else if (recipientAccount == null) {</span>
+<span class="nc" id="L49">      type = TransactionType.WITHDRAWAL;</span>
+<span class="nc" id="L50">      this.payer = payerAccount.getName();</span>
+<span class="nc" id="L51">      this.payersAccountNumber = payerAccount.getAccountNumber();</span>
+<span class="nc" id="L52">      this.recipient = &quot;&quot;;</span>
+<span class="nc" id="L53">      this.recipientsAccountNumber = 0;</span>
+    } else {
+<span class="nc" id="L55">      type = TransactionType.TRANSFER;</span>
+<span class="nc" id="L56">      this.payer = payerAccount.getName();</span>
+<span class="nc" id="L57">      this.payersAccountNumber = payerAccount.getAccountNumber();</span>
+<span class="nc" id="L58">      this.recipient = recipientAccount.getName();</span>
+<span class="nc" id="L59">      this.recipientsAccountNumber = recipientAccount.getAccountNumber();</span>
+    }
+<span class="nc" id="L61">    this.amount = amount;</span>
+<span class="nc" id="L62">  }</span>
+
+  /**
+   * A method for creating an transaction object.
+   *
+   * @param payer user that pays.
+   * @param payersAccountNumber accountnumber of the payer.
+   * @param recipient the reciver of the transaction.
+   * @param recipientsAccountNumber accountnumber of the reciver.
+   * @param amount that is being transferd.
+   * @throws IllegalArgumentException if there is no payer or recipent.
+   */
+  public Transaction(String payer, int payersAccountNumber, String recipient, 
+<span class="nc" id="L75">      int recipientsAccountNumber, double amount) {</span>
+<span class="nc bnc" id="L76" title="All 4 branches missed.">    if (payer.equals(&quot;&quot;) &amp;&amp; recipient.equals(&quot;&quot;)) {</span>
+<span class="nc" id="L77">      throw new IllegalArgumentException(&quot;A transaction must have either 'payer' or a&quot; </span>
+          + &quot; 'recipient', but both were null&quot;);
+    }
+<span class="nc bnc" id="L80" title="All 2 branches missed.">    if (payer.equals(&quot;&quot;)) {</span>
+<span class="nc" id="L81">      type = TransactionType.DEPOSIT;</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">    } else if (recipient.equals(&quot;&quot;)) {</span>
+<span class="nc" id="L83">      type = TransactionType.WITHDRAWAL;</span>
+    } else {
+<span class="nc" id="L85">      type = TransactionType.TRANSFER;</span>
+    }
+<span class="nc" id="L87">    this.payer = payer;</span>
+<span class="nc" id="L88">    this.payersAccountNumber = payersAccountNumber;</span>
+<span class="nc" id="L89">    this.recipient = recipient;</span>
+<span class="nc" id="L90">    this.recipientsAccountNumber = recipientsAccountNumber;</span>
+<span class="nc" id="L91">    this.amount = amount;</span>
+<span class="nc" id="L92">  }</span>
+
+  public TransactionType getType() {
+<span class="nc" id="L95">    return type;</span>
+  }
+
+  public String getPayer() {
+<span class="nc" id="L99">    return payer;</span>
+  }
+
+  public String getRecipient() {
+<span class="nc" id="L103">    return recipient;</span>
+  }
+
+  public int getPayersAccountNumber() {
+<span class="nc" id="L107">    return payersAccountNumber;</span>
+  }
+
+  public int getRecipientsAccountNumber() {
+<span class="nc" id="L111">    return recipientsAccountNumber;</span>
+  }
+
+  public double getAmount() {
+<span class="nc" id="L115">    return amount;</span>
+  }
+
+  /**
+   * Tostring for the transaction.
+   */
+  @Override
+  public String toString() {
+<span class="nc" id="L123">    return &quot;type: &quot; + type + &quot;\npayer: &quot; + payer + &quot;\npayersAccountNumber: &quot;</span>
+        + payersAccountNumber + &quot;\nrecipient: &quot; + recipient + &quot;\nrecipientsAccountNumber: &quot;
+        + recipientsAccountNumber + &quot;\namount: &quot; + amount;
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

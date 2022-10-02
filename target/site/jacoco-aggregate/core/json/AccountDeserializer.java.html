@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>AccountDeserializer.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">ui</a> &gt; <a href="../index.html" class="el_bundle">core</a> &gt; <a href="index.source.html" class="el_package">json</a> &gt; <span class="el_source">AccountDeserializer.java</span></div><h1>AccountDeserializer.java</h1><pre class="source lang-java linenums">package json;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.DoubleNode;
+import com.fasterxml.jackson.databind.node.IntNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import core.AbstractAccount;
+import core.BsuAccount;
+import core.CheckingAccount;
+import core.SavingsAccount;
+import core.Transaction;
+import java.io.IOException;
+
+/**
+ * A class that deserialize an account object.
+ */
+<span class="nc" id="L24">public class AccountDeserializer extends JsonDeserializer&lt;AbstractAccount&gt; {</span>
+
+<span class="nc" id="L26">  private TransactionDeserializer transactionDeserializer = new TransactionDeserializer();</span>
+
+  /**
+   * Method for deserialization of an AbstractAccount object.
+   *
+   * @param parser a JsonParser object.
+   * @param ctxt a DeserializationContext object.
+   * @return AbstractAccount object which is returned from helper method
+   * @throws IOException if I/O problem when processing JSON content.
+   * @throws JsonProcessingException if porblem other than I/O is encountered when processing JSON
+   *         content.
+   */
+  @Override
+  public AbstractAccount deserialize(JsonParser parser, DeserializationContext ctxt)
+      throws IOException, JsonProcessingException {
+<span class="nc" id="L41">    TreeNode treeNode = parser.getCodec().readTree(parser);</span>
+<span class="nc" id="L42">    return deserialize((JsonNode) treeNode);</span>
+  }
+
+  /**
+   * Helper method for deserialization of an AbstractAccount object.
+   *
+   * @param jsonNode a JsonNode object.
+   * @return an AbstractAccount object of variyng type depending on the content of the 
+   *        &quot;type&quot; node in jsonNode.
+   */
+  public AbstractAccount deserialize(JsonNode jsonNode) {
+<span class="nc bnc" id="L53" title="All 2 branches missed.">    if (jsonNode instanceof ObjectNode) {</span>
+<span class="nc" id="L54">      ObjectNode objectNode = (ObjectNode) jsonNode;</span>
+
+<span class="nc" id="L56">      String type = &quot;&quot;;</span>
+<span class="nc" id="L57">      String name = &quot;&quot;;</span>
+<span class="nc" id="L58">      double balance = 0.0;</span>
+<span class="nc" id="L59">      int accountNumber = 0;</span>
+
+<span class="nc" id="L61">      JsonNode typeNode = objectNode.get(&quot;type&quot;);</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">      if (typeNode instanceof TextNode) {</span>
+<span class="nc" id="L63">        type = typeNode.asText();</span>
+      }
+
+<span class="nc" id="L66">      JsonNode nameNode = objectNode.get(&quot;name&quot;);</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">      if (nameNode instanceof TextNode) {</span>
+<span class="nc" id="L68">        name = nameNode.asText();</span>
+      }
+
+<span class="nc" id="L71">      JsonNode balanceNode = objectNode.get(&quot;balance&quot;);</span>
+<span class="nc bnc" id="L72" title="All 2 branches missed.">      if (balanceNode instanceof DoubleNode) {</span>
+<span class="nc" id="L73">        balance = balanceNode.asDouble();</span>
+      }
+
+<span class="nc" id="L76">      JsonNode acNumberNode = objectNode.get(&quot;accountNumber&quot;);</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">      if (acNumberNode instanceof IntNode) {</span>
+<span class="nc" id="L78">        accountNumber = acNumberNode.asInt();</span>
+      }
+
+<span class="nc" id="L81">      AbstractAccount account = null;</span>
+<span class="nc bnc" id="L82" title="All 4 branches missed.">      switch (type) {</span>
+        case &quot;checking&quot;:
+<span class="nc" id="L84">          account = new CheckingAccount(name, balance, accountNumber, null);</span>
+<span class="nc" id="L85">          break;</span>
+        case &quot;savings&quot;:
+<span class="nc" id="L87">          account = new SavingsAccount(name, balance, accountNumber, null);</span>
+<span class="nc" id="L88">          break;</span>
+        case &quot;bsu&quot;:
+<span class="nc" id="L90">          account = new BsuAccount(name, balance, accountNumber, null);</span>
+<span class="nc" id="L91">          break;</span>
+        default:
+<span class="nc" id="L93">          throw new IllegalStateException(&quot;Could not create account of existing type.&quot;);</span>
+      }
+<span class="nc" id="L95">      JsonNode transactionHistoryNode = objectNode.get(&quot;transactionHistory&quot;);</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">      if (transactionHistoryNode instanceof ArrayNode) {</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">        for (JsonNode transactionNode : transactionHistoryNode) {</span>
+<span class="nc" id="L98">          Transaction transaction = transactionDeserializer.deserialize(transactionNode);</span>
+<span class="nc" id="L99">          account.addToTransactionHistory(transaction);</span>
+<span class="nc" id="L100">        }</span>
+      }
+<span class="nc" id="L102">      return account;</span>
+
+    }
+<span class="nc" id="L105">    return null;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>
